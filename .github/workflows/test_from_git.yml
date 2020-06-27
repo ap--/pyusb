@@ -1,0 +1,87 @@
+name: pyusb install from git
+on: [push, pull_request]
+
+jobs:
+  install_debians:
+    name: Test install on ${{ matrix.container }} for ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        container:
+          - ubuntu:20.04
+          - ubuntu:19.10
+          - ubuntu:18.04
+          - ubuntu:16.04
+          - ubuntu:14.04
+          - debian:buster
+          - debian:stretch
+          - debian:jessie
+        python:
+          - python
+          - python3
+    steps:
+      - name: Install setuptools
+        run: |
+          apt-get update
+          apt-get install -y ${{ matrix.python }}-setuptools
+      - name: Install setuptools-scm
+        continue-on-error: true
+        run: |
+          apt-get install -y ${{ matrix.python }}-setuptools-scm
+      - name: Ubuntu 20.04 python alias
+        if: matrix.container == 'ubuntu:20.04'
+        run: apt-get install -y python-is-python2
+      - uses: actions/checkout@v1
+      - name: Show python version
+        run: |
+          ${{ matrix.python }} -c "import sys; print(sys.version_info)"
+      - name: Show setuptools version
+        run: |
+          ${{ matrix.python }} -c "from setuptools import __version__; print(__version__)"
+      - name: Test install
+        run: ${{ matrix.python }} setup.py install
+      - name: Assert Version
+        run: ${{ matrix.python }} -c "import usb, sys; (usb.__version__ != '0.0.0') or sys.exit(1); print(usb.__version__)"
+
+  install_redhats:
+    name: Test install on ${{ matrix.container }} for ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    strategy:
+      max-parallel: 2
+      fail-fast: false
+      matrix:
+        container:
+          - centos:centos8
+        python:
+          - python3
+          - python2
+        include:
+          # include centos7 and centos6 with the default python
+          - container: centos:centos7
+            python: python
+          - container: centos:centos6
+            python: python
+    steps:
+      - name: centos8 install python
+        if: matrix.container == 'centos:centos8'
+        run: |
+          yum install -y ${{ matrix.python }}
+          mkdir -p /usr/local/lib/python3.6/site-packages/
+      - name: Install setuptools
+        run: |
+          yum install -y ${{ matrix.python }}-setuptools
+      - uses: actions/checkout@v1
+      - name: Show python version
+        run: |
+          ${{ matrix.python }} -c "import sys; print(sys.version_info)"
+      - name: Show setuptools version
+        run: |
+          ${{ matrix.python }} -c "from setuptools import __version__; print(__version__)"
+      - name: Test install
+        run: ${{ matrix.python }} setup.py install
+      - name: Assert Version
+        run: ${{ matrix.python }} -c "import usb, sys; (usb.__version__ != '0.0.0') or sys.exit(1); print(usb.__version__)"
