@@ -93,7 +93,9 @@ jobs:
     steps:
       - name: centos8 install python
         if: matrix.container == 'centos:centos8'
-        run: yum install -y ${{ matrix.python }}
+        run: |
+          yum install -y ${{ matrix.python }}
+          mkdir -p /usr/local/lib/python3.6/site-packages/
       - name: Install setuptools
         run: |
           yum install -y ${{ matrix.python }}-setuptools
