@@ -1,4 +1,4 @@
-name: pyusb packaging
+name: pyusb install from sdist
 on: [push, pull_request]
 
 jobs:
