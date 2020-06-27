@@ -56,6 +56,10 @@ jobs:
       - name: Ubuntu 20.04 python alias
         if: matrix.container == 'ubuntu:20.04'
         run: apt-get install -y python-is-python2
+      - name: Install Certificates for Jessie
+        if: matrix.container == 'debian:jessie'
+        run: |
+          apt-get install -y ca-certificates
       - uses: actions/download-artifact@v2
         with:
           name: pyusb-sdist
