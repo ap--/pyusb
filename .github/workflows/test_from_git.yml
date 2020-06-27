@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   install_debians:
-    name: Test install on ${{ matrix.container }} for ${{ matrix.python }}
+    name: ${{ matrix.container }}/${{ matrix.python }}
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     strategy:
@@ -50,7 +50,7 @@ jobs:
         run: ${{ matrix.python }} -c "import usb, sys; (usb.__version__ != '0.0.0') or sys.exit(1); print(usb.__version__)"
 
   install_redhats:
-    name: Test install on ${{ matrix.container }} for ${{ matrix.python }}
+    name: ${{ matrix.container }}/${{ matrix.python }}
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}
     strategy:
