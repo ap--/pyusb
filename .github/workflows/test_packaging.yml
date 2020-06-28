@@ -92,8 +92,10 @@ jobs:
           # include centos7 and centos6 with the default python
           - container: centos:centos7
             python: python
-          - container: centos:centos6
-            python: python
+          # don't include centos6...
+          # github action download-artifact requires newer libc
+          # - container: centos:centos6
+          #   python: python
     steps:
       - name: centos8 install python
         if: matrix.container == 'centos:centos8'
