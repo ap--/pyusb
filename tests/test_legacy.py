@@ -36,10 +36,9 @@ import usb
 import usb.core
 from usb._debug import methodtrace
 
-class LegacyTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self):
-        unittest.TestCase.__init__(self)
+
+@utils.compat_usefixtures("my_device")
+class LegacyTest(utils.CompatTestCase):
 
     @methodtrace(utils.logger)
     def runTest(self):

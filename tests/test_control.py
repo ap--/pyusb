@@ -40,11 +40,14 @@ import usb.backend.openusb as openusb
 from usb._debug import methodtrace
 import sys
 
-class ControlTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, dev):
-        unittest.TestCase.__init__(self)
-        self.dev = dev
+
+@utils.compat_usefixtures("my_device")
+class ControlTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, dev):
+            super(ControlTest, self).__init__()
+            self.dev = dev
 
     @methodtrace(utils.logger)
     def runTest(self):

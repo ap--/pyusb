@@ -51,11 +51,14 @@ def make_data_list(length = 8):
             utils.get_str_data1(length),
             utils.get_str_data1(length))
 
-class DeviceTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, dev):
-        unittest.TestCase.__init__(self)
-        self.dev = dev
+
+@utils.compat_usefixtures("my_device")
+class DeviceTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, dev):
+            super(DeviceTest, self).__init__()
+            self.dev = dev
 
     @methodtrace(utils.logger)
     def runTest(self):
@@ -267,11 +270,18 @@ class DeviceTest(unittest.TestCase):
         self.dev.clear_halt(0x01)
         self.dev.clear_halt(0x81)
 
-class ConfigurationTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, dev):
-        unittest.TestCase.__init__(self)
-        self.cfg = dev[0]
+
+@utils.compat_usefixtures("my_device")
+class ConfigurationTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, dev):
+            super(ConfigurationTest, self).__init__()
+            self.dev = dev
+
+    @property
+    def cfg(self):
+        return self.dev[0]
 
     @methodtrace(utils.logger)
     def runTest(self):
@@ -296,12 +306,18 @@ class ConfigurationTest(unittest.TestCase):
     def test_set(self):
         self.cfg.set()
 
-class InterfaceTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, dev):
-        unittest.TestCase.__init__(self)
-        self.dev = dev
-        self.intf = dev[0][(0,0)]
+
+@utils.compat_usefixtures("my_device")
+class InterfaceTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, dev):
+            super(InterfaceTest, self).__init__()
+            self.dev = dev
+
+    @property
+    def intf(self):
+        return self.dev[0][(0, 0)]
 
     @methodtrace(utils.logger)
     def runTest(self):
@@ -328,14 +344,26 @@ class InterfaceTest(unittest.TestCase):
     def test_set_altsetting(self):
         self.intf.set_altsetting()
 
-class EndpointTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, dev):
-        unittest.TestCase.__init__(self)
-        self.dev = dev
-        intf = dev[0][(0,0)]
-        self.ep_out = usb.util.find_descriptor(intf, bEndpointAddress=0x01)
-        self.ep_in = usb.util.find_descriptor(intf, bEndpointAddress=0x81)
+
+@utils.compat_usefixtures("my_device")
+class EndpointTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, dev):
+            super(EndpointTest, self).__init__()
+            self.dev = dev
+
+    @property
+    def intf(self):
+        return self.dev[0][(0, 0)]
+
+    @property
+    def ep_out(self):
+        return usb.util.find_descriptor(self.intf, bEndpointAddress=0x01)
+
+    @property
+    def ep_in(self):
+        return usb.util.find_descriptor(self.intf, bEndpointAddress=0x81)
 
     @methodtrace(utils.logger)
     def runTest(self):

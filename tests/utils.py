@@ -124,3 +124,20 @@ def is_windows():
 
 def is_iso_test_allowed():
     return int(os.getenv('PYUSB_TEST_ISO_TRANSFER', 1))
+
+# pytest compatibility
+RUNNING_VIA_PYTEST = "pytest" in sys.modules
+
+def compat_usefixtures(*fixtures):
+    if not RUNNING_VIA_PYTEST:
+        return lambda x: x
+
+    else:  # running via pytest
+        import pytest
+        return pytest.mark.usefixtures(*fixtures)
+
+if RUNNING_VIA_PYTEST:
+    import pytest
+    CompatTestCase = object
+else:
+    CompatTestCase = unittest.TestCase

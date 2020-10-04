@@ -39,11 +39,13 @@ from usb._debug import methodtrace
 import time
 import sys
 
-class BackendTest(unittest.TestCase):
-    @methodtrace(utils.logger)
-    def __init__(self, backend):
-        unittest.TestCase.__init__(self)
-        self.backend = backend
+@utils.compat_usefixtures("my_device")
+class BackendTest(utils.CompatTestCase):
+    if not utils.RUNNING_VIA_PYTEST:
+        @methodtrace(utils.logger)
+        def __init__(self, backend):
+            super(BackendTest, self).__init__()
+            self.backend = backend
 
     @methodtrace(utils.logger)
     def runTest(self):
